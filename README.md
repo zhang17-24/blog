@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-打开 http://localhost:5173/ 就能看到站点。改任何 `.md` 文件都是**毫秒级热更新**，不用刷新。
+打开 `http://localhost:5173/` 就能看到站点。改任何 `.md` 文件都是**毫秒级热更新**，不用刷新。
 
 ```bash
 npm run build     # 构建到 .vitepress/dist

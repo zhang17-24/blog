@@ -1,6 +1,7 @@
 ---
 sidebar: false
 aside: false
+lastUpdated: false
 title: 首页
 description: 写代码，也写生活。
 ---

@@ -45,6 +45,10 @@ export default defineConfig({
     lineNumbers: true
   },
 
+  // README 是给人和 GitHub 看的，不要当成页面渲染；
+  // deploy/ 下是部署配置，也不参与构建
+  srcExclude: ['**/README.md', 'deploy/**'],
+
   themeConfig: {
     logo: '/logo.svg',
     siteTitle: SITE_TITLE,

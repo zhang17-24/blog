@@ -1,0 +1,177 @@
+/* ============================================================
+   全局样式覆盖
+   VitePress 的默认主题变量都在 --vp-c-* 里，改这里就能换肤
+   ============================================================ */
+
+:root {
+  /* 主色：换成你喜欢的品牌色即可 */
+  --vp-c-brand-1: #2f6fed;
+  --vp-c-brand-2: #4b83f0;
+  --vp-c-brand-3: #5a8ef2;
+  --vp-c-brand-soft: rgba(47, 111, 237, 0.14);
+
+  /* 正文字体：中文优先，让阅读更舒服 */
+  --vp-font-family-base: -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+
+  /* 内容区宽度，比默认的 688px 稍宽一点 */
+  --vp-layout-max-width: 1400px;
+}
+
+.dark {
+  --vp-c-brand-1: #6ea0ff;
+  --vp-c-brand-2: #5a8ef2;
+  --vp-c-brand-3: #4b83f0;
+}
+
+/* 正文行高与段落间距：默认偏紧凑，中文长文需要更松 */
+.vp-doc p,
+.vp-doc li {
+  line-height: 1.8;
+}
+
+.vp-doc h2 {
+  margin-top: 44px;
+  padding-top: 22px;
+}
+
+/* ============================================================
+   首页
+   ============================================================ */
+
+.home-hero {
+  padding: 26px 0 10px;
+}
+
+.home-hero h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -1.4px;
+  border: none;
+  padding: 0;
+}
+
+.home-hero p {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--vp-c-text-2);
+}
+
+.home-hero .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.home-hero .links a {
+  padding: 7px 15px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  transition: all 0.18s;
+}
+
+.home-hero .links a:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.home-sec {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 46px 0 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.home-sec h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.home-sec .more {
+  margin-left: auto;
+  font-size: 13.5px;
+  color: var(--vp-c-text-3);
+  text-decoration: none;
+}
+
+.home-sec .more:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* 首页 / 归档 / 标签 / 关于：关掉侧栏后把内容区放宽一点 */
+.VPDoc:not(.has-aside) .content-container {
+  max-width: 880px;
+}
+
+/* 这些页面的 h1 由 vp-doc 加了下边框，首页自己控制 */
+.vp-doc .home-hero h1,
+.vp-doc .home-sec h2 {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ============================================================
+   文章页：标题区更醒目
+   ============================================================ */
+
+.vp-doc h1 {
+  font-size: 32px;
+  letter-spacing: -0.9px;
+  line-height: 1.28;
+}
+
+/* 代码块：稍加圆角与内边距 */
+.vp-doc div[class*='language-'] {
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+/* 引用块配色更柔和 */
+.vp-doc blockquote {
+  border-left: 3px solid var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 18px;
+}
+
+.vp-doc blockquote > p {
+  color: var(--vp-c-text-2);
+  font-size: 14.5px;
+}
+
+/* 表格 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  font-size: 14px;
+}
+
+/* ============================================================
+   移动端
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .home-hero h1 {
+    font-size: 30px;
+    letter-spacing: -1px;
+  }
+
+  .vp-doc h1 {
+    font-size: 25px;
+  }
+}

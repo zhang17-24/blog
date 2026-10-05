@@ -1,0 +1,53 @@
+name: 构建并部署博客
+
+on:
+  push:
+    branches: [main]
+  # 也可以在 Actions 页面手动点一下触发
+  workflow_dispatch:
+
+# 只保留最新一次部署，避免连续 push 时排队
+concurrency:
+  group: deploy-blog
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          # 关键：lastUpdated 依赖完整的 git 历史，
+          # 默认的浅克隆（fetch-depth: 1）会让所有文章显示同一个更新日期
+          fetch-depth: 0
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建
+        run: npm run build
+
+      - name: 配置 SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.DEPLOY_PORT || 22 }}" -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 同步到服务器
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.DEPLOY_PORT || 22 }}" \
+            .vitepress/dist/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}"
+
+      - name: 完成
+        run: echo "已部署到 https://${{ secrets.DEPLOY_HOST }}"

@@ -1,0 +1,27 @@
+# 服务器上只需要跑这个 —— 静态文件 + 自动 HTTPS
+# 用法：docker compose up -d
+#
+# 首次部署前先准备好：
+#   1. 域名 A 记录指向这台服务器
+#   2. 80 / 443 端口没被别的服务占用
+#   3. 把 Caddyfile 里的域名改成你自己的
+
+services:
+  web:
+    image: caddy:2-alpine
+    container_name: blog
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dist:/srv/blog:ro
+      # 证书存在 caddy_data 里，这个卷千万不能删
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

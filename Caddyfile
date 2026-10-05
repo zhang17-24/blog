@@ -1,0 +1,34 @@
+# 把 blog.example.com 换成你自己的域名，Caddy 会自动申请并续期 HTTPS 证书
+blog.example.com {
+	root * /srv/blog
+
+	# 压缩传输
+	encode zstd gzip
+
+	# cleanUrls 打开后，/posts/hello 实际对应 posts/hello.html，
+	# 少了这行直接访问文章页会 404
+	try_files {path} {path}.html {path}/index.html /404.html
+
+	file_server
+
+	# 带 hash 的静态资源可以放心长期缓存（文件名变了内容才变）
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML 不缓存，保证改完立刻生效
+	@html path *.html /
+	header @html Cache-Control "public, max-age=0, must-revalidate"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}

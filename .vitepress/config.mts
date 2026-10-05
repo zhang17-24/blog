@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
 import { genFeed } from './theme/build-hooks'
 import { buildGuideSidebar } from './guides'
@@ -17,6 +20,48 @@ function cjkTokenize(text: string): string[] {
   }
   // 兜底：按单字切分
   return text.split('')
+}
+
+/**
+ * 侧边栏是在「配置加载时」扫描目录算出来的，
+ * 而 VitePress 只在 config 文件及其依赖变化时才重新加载配置
+ * （见 vitepress/dist/node 里的 handleHotUpdate：
+ *   `if (file === configPath || configDeps.includes(file))`）。
+ *
+ * 单纯调 server.restart() 只重启 Vite，不会重跑 buildGuideSidebar()，
+ * 侧边栏还是旧的。正确做法是让 VitePress 自己走配置重载流程 ——
+ * 本文件 import 了 guides.ts，所以 guides.ts 属于 configDeps，
+ * 更新它的 mtime 就能触发完整重载。
+ *
+ * 效果：dev 模式下新增/删除指南目录或章节，侧边栏自动刷新。
+ * 只影响 dev（apply: 'serve'），构建流程不受影响。
+ */
+function watchGuides() {
+  const guidesModule = fileURLToPath(new URL('./guides.ts', import.meta.url))
+  return {
+    name: 'watch-guides-sidebar',
+    apply: 'serve' as const,
+    configureServer(server: any) {
+      let timer: ReturnType<typeof setTimeout> | null = null
+      const onChange = (file: string) => {
+        const f = file.split(path.sep).join('/')
+        if (!f.endsWith('.md')) return
+        if (!f.includes('/guides/')) return
+        if (timer) clearTimeout(timer)
+        // 防抖：编辑器保存 / 批量创建会连着触发好几次
+        timer = setTimeout(() => {
+          const now = new Date()
+          try {
+            fs.utimesSync(guidesModule, now, now)
+          } catch {
+            /* 忽略：碰不到文件就让用户手动重启 */
+          }
+        }, 300)
+      }
+      server.watcher.on('add', onChange)
+      server.watcher.on('unlink', onChange)
+    }
+  }
 }
 
 export default defineConfig({
@@ -65,7 +110,8 @@ export default defineConfig({
     /**
      * 侧边栏是自动生成的 —— 扫描 guides/ 下的每个技术目录，
      * 每个技术变成一个可折叠分组，组内是该技术的章节。
-     * 新增技术：建目录 + 写 index.md + 加章节文件，然后重启 dev 服务器。
+     * 新增技术：建目录 + 写 index.md + 加章节文件即可，不用改这里。
+     * （dev 模式下由下面的 watchGuides 插件自动重启刷新）
      */
     sidebar: {
       '/guides/': buildGuideSidebar()
@@ -133,5 +179,9 @@ export default defineConfig({
   // 构建结束：生成 RSS
   buildEnd: async (siteConfig) => {
     await genFeed(siteConfig)
+  },
+
+  vite: {
+    plugins: [watchGuides()]
   }
 })

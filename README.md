@@ -18,6 +18,44 @@ npm run preview   # 本地预览构建产物（和线上一致）
 
 > 环境要求：Node 18+（推荐 22，仓库里有 `.nvmrc`）。
 
+## 日常流程：从写到发布
+
+四步，前三步都在本地，最后一步自动完成。
+
+```bash
+# 1. 开本地服务器（写完保存就热更新，不用刷新浏览器）
+npm run dev
+
+# 2. 写内容
+#    文章   → posts/我的新文章.md
+#    指南   → guides/<技术>/03-新章节.md
+
+# 3. 本地确认无误后构建一次（会检查死链，有错会直接失败）
+npm run build
+
+# 4. 提交推送，剩下的交给 CI
+git add -A
+git commit -m "新增：xxx"
+git push
+```
+
+`git push` 之后 GitHub Actions 会自动构建并把产物 rsync 到你的服务器，
+**不需要在服务器上做任何事**。进度在仓库的 Actions 页面看。
+
+::: tip 什么时候可以不用 build
+`npm run dev` 已经能看到效果，但 `build` 会额外做两件 dev 不做的事：
+**检查站内死链**、**生成 RSS 和 sitemap**。所以推送前跑一次更稳。
+:::
+
+### 只想先写不想发
+
+`dev` 服务器开着，写多少都只在自己电脑上。GitHub 上不 push 就没人看得到。
+
+### 想先在服务器上试，不影响正式站
+
+用 `npm run preview`（本地预览构建产物，和线上完全一致），或者
+按下面「方式 C」在服务器上另起一个端口先试。
+
 ## 目录结构
 
 ```
@@ -77,6 +115,58 @@ description: 一句话摘要，会显示在列表里。不写的话会自动截�
 `posts/` 下放草稿或说明页。
 
 阅读时长会根据正文字数自动计算（中文按 350 字/分钟）。
+
+## Markdown 增强写法
+
+除了标准 Markdown，还有几个高频用法：
+
+**提示块**（`tip` / `warning` / `danger` / `info` / `details`）：
+
+```md
+::: tip 小技巧
+这里是提示内容。
+:::
+
+::: warning 注意
+这里是警告。
+:::
+```
+
+**代码块**（带行号、可高亮指定行）：
+
+````md
+```ts{2}
+const a = 1
+const b = 2   // 这一行会高亮
+```
+````
+
+**代码组**（多语言切换的标签页）：
+
+````md
+::: code-group
+
+```bash [npm]
+npm install
+```
+
+```bash [pnpm]
+pnpm install
+```
+
+:::
+````
+
+**站内链接**（`cleanUrls` 已开启，**不要写 `.html`**）：
+
+```md
+[去看 Rust 所有权](/guides/rust/01-ownership)
+```
+
+写错路径 `npm run build` 会直接报错并列出文件，这是好事，别关掉死链检查。
+
+**其他**：`<Badge text="新" />` 徽章、`<details>` 折叠、`<kbd>` 按键样式、
+直接在 md 里写 Vue 组件（比如 `<PostList :per-page="6" />`）。
 
 ## 改站点信息
 
@@ -160,10 +250,15 @@ guides/
    # Pod 与容器
    ```
 
-4. 重启 `npm run dev`，左侧目录自动出现新的分组。
+4. 保存 —— **不用重启**，`npm run dev` 会自动重载并刷新左侧目录。
 
 **不需要改任何配置文件** —— 侧边栏由 `.vitepress/guides.ts` 扫描目录生成，
 指南总览页的卡片由 `.vitepress/theme/guides.data.ts` 聚合生成。
+
+> 为什么能自动刷新：侧边栏是「配置加载时」算出来的，而 VitePress 只在配置及其依赖
+> 变化时才重新加载。`config.mts` 里注册了一个 `watch-guides-sidebar` 插件，
+> 监听 `guides/` 下的 md 增删后轻碰 `guides.ts` 的 mtime，触发 VitePress 走完整的
+> 配置重载流程。只影响 dev，构建不受影响。
 
 | frontmatter 字段 | 作用 | 必填 |
 | --- | --- | --- |

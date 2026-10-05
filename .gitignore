@@ -5,3 +5,6 @@ node_modules
 *.log
 .env
 .env.local
+
+# VitePress 每次加载 TS 配置都会生成这种临时文件，不要提交
+*.timestamp-*.mjs

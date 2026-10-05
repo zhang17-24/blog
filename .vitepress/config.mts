@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { genFeed } from './theme/build-hooks'
+import { buildGuideSidebar } from './guides'
 import { SITE_URL, SITE_TITLE, SITE_DESC } from './site'
 
 /**
@@ -55,29 +56,19 @@ export default defineConfig({
 
     nav: [
       { text: '首页', link: '/' },
-      { text: '笔记', link: '/notes/', activeMatch: '/notes/' },
+      { text: '指南', link: '/guides/', activeMatch: '/guides/' },
       { text: '归档', link: '/archive' },
       { text: '标签', link: '/tags' },
       { text: '关于', link: '/about' }
     ],
 
-    // 只给「笔记」区域配侧边栏；博客区（/posts/）保持无侧栏的干净阅读
+    /**
+     * 侧边栏是自动生成的 —— 扫描 guides/ 下的每个技术目录，
+     * 每个技术变成一个可折叠分组，组内是该技术的章节。
+     * 新增技术：建目录 + 写 index.md + 加章节文件，然后重启 dev 服务器。
+     */
     sidebar: {
-      '/notes/': [
-        {
-          text: 'Rust 笔记',
-          collapsed: false,
-          items: [
-            { text: '所有权', link: '/notes/rust/ownership' },
-            { text: '生命周期', link: '/notes/rust/lifetimes' }
-          ]
-        },
-        {
-          text: '自托管',
-          collapsed: false,
-          items: [{ text: 'Docker 与 Caddy', link: '/notes/selfhost/docker-caddy' }]
-        }
-      ]
+      '/guides/': buildGuideSidebar()
     },
 
     outline: { level: [2, 3], label: '本页目录' },

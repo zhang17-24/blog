@@ -3,6 +3,7 @@ import { h } from 'vue'
 import PostList from './components/PostList.vue'
 import TagIndex from './components/TagIndex.vue'
 import ArchiveList from './components/ArchiveList.vue'
+import GuideIndex from './components/GuideIndex.vue'
 import Comment from './components/Comment.vue'
 import './style.css'
 
@@ -27,5 +28,6 @@ export default {
     app.component('PostList', PostList)
     app.component('TagIndex', TagIndex)
     app.component('ArchiveList', ArchiveList)
+    app.component('GuideIndex', GuideIndex)
   }
 }

@@ -27,20 +27,30 @@ npm run preview   # 本地预览构建产物（和线上一致）
 ├─ tags.md                     ← 标签页（点标签筛选）
 ├─ about.md                    ← 关于页
 ├─ posts/                      ← 文章：写在这里就会被自动收录
-├─ notes/                      ← 成体系的笔记：左侧有目录树
+├─ guides/                     ← 学习指南：左侧目录树 + 右侧内容
+│  ├─ index.md                 ← 指南总览（自动生成技术卡片）
+│  ├─ rust/
+│  │  ├─ index.md              ← 该技术的概览页
+│  │  ├─ 01-ownership.md
+│  │  ├─ 02-lifetimes.md
+│  │  └─ 03-traits.md
+│  ├─ python/  docker/  git/  sql/  linux/ ...
 ├─ public/                     ← 静态资源，原样拷到根目录
 ├─ .vitepress/
 │  ├─ config.mts               ← 站点配置：导航、侧栏、搜索
 │  ├─ site.ts                  ← 站点信息：域名、标题、评论配置
+│  ├─ guides.ts                ← 扫描 guides/ 自动生成侧边栏
 │  └─ theme/
 │     ├─ index.ts              ← 主题入口（必须有）
 │     ├─ posts.data.ts         ← 文章列表数据加载器
+│     ├─ guides.data.ts        ← 指南总览数据加载器
 │     ├─ build-hooks.ts        ← 构建结束时生成 RSS
 │     ├─ style.css             ← 全局样式覆盖
 │     └─ components/
 │        ├─ PostList.vue       ← 文章列表 + 分页
 │        ├─ TagIndex.vue       ← 标签云
 │        ├─ ArchiveList.vue    ← 归档列表
+│        ├─ GuideIndex.vue     ← 指南总览卡片
 │        └─ Comment.vue        ← Giscus 评论区
 ├─ Dockerfile                  ← 多阶段构建：Node 构建 → Caddy 托管
 ├─ Caddyfile                   ← 自动 HTTPS 配置
@@ -107,12 +117,69 @@ export const SITE_DESC = '写代码，也写生活。'
 
 `repo` 为空时评论区自动隐藏，不会报错。
 
-## 新增一篇笔记
+## 学习指南（左侧目录树 + 右侧内容）
 
-笔记和文章的区别：笔记有左侧目录树，适合成体系的内容。
+`guides/` 下每个子目录是一个**技术方向**，左侧目录树就是按这个结构自动生成的。
 
-1. 在 `notes/` 下新建 `.md`
-2. 在 `.vitepress/config.mts` 的 `themeConfig.sidebar['/notes/']` 里加一条
+```
+guides/
+├─ index.md          ← 指南总览，卡片自动从各技术目录生成
+├─ rust/
+│  ├─ index.md       ← 该技术概览，frontmatter 的 title 作为侧栏分组名
+│  ├─ 01-ownership.md
+│  ├─ 02-lifetimes.md
+│  └─ 03-traits.md
+└─ python/ ...
+```
+
+### 新增一个技术方向
+
+1. 建目录：`mkdir guides/k8s`
+2. 写概览页 `guides/k8s/index.md`：
+
+   ```md
+   ---
+   title: Kubernetes
+   description: 从 Pod 到 Service，把编排这件事理清楚。
+   order: 7
+   ---
+
+   # Kubernetes
+
+   这里是这个方向的学习路径说明。
+   ```
+
+3. 写章节，**文件名加数字前缀**控制顺序：
+
+   ```md
+   ---
+   title: Pod 与容器
+   description: 最小的调度单位。
+   ---
+
+   # Pod 与容器
+   ```
+
+4. 重启 `npm run dev`，左侧目录自动出现新的分组。
+
+**不需要改任何配置文件** —— 侧边栏由 `.vitepress/guides.ts` 扫描目录生成，
+指南总览页的卡片由 `.vitepress/theme/guides.data.ts` 聚合生成。
+
+| frontmatter 字段 | 作用 | 必填 |
+| --- | --- | --- |
+| `title` | 侧栏显示的名字 | 是（不写会退回文件名或一级标题） |
+| `description` | 概览页的简介、总览卡片的描述 | 否 |
+| `order` | 技术分组的排序（小的在前），只写在 `index.md` 里 | 否（默认 99） |
+
+::: tip 章节排序
+章节按**文件名**排序，所以用 `01-`、`02-` 这样的前缀控制顺序。
+不想显示数字的话，前缀只影响排序，侧栏显示的是 frontmatter 里的 `title`。
+:::
+
+### 为什么侧边栏是折叠的
+
+每个技术分组默认折叠，避免技术多了之后侧栏太长。
+**进入某个技术的页面时，VitePress 会自动展开它所在的分组。**
 
 ## 部署
 
@@ -227,6 +294,15 @@ MiniSearch 默认按空格分词。`config.mts` 里已经用 `Intl.Segmenter` �
 **构建失败提示死链**
 VitePress 会检查站内链接。写错相对路径就会构建失败 —— 这是好事，但第一次遇到会懵。
 临时可以在 config 里加 `ignoreDeadLinks: true`，但别长期开着。
+
+**构建时刷屏 `The language 'xxx' is not loaded`**
+代码块的语言标记必须是 Shiki 内置的。写 `caddy`、`gitignore`、`ini` 之类没内置的
+会 fallback 成 `txt` —— 不影响构建，只是没有高亮，但日志很吵。
+处理方式：把语言标记换成最接近的内置语言，或者干脆写 `txt`。
+
+**找不到 `dist/` 目录**
+VitePress 的默认输出目录是 **`.vitepress/dist`**，不是项目根的 `dist/`。
+`npm run preview` 也是从这个目录起的服务。
 
 ## 常用命令
 

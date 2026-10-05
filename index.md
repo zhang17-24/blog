@@ -25,14 +25,59 @@ description: 写代码，也写生活。
 <PostList :per-page="6" />
 
 <div class="home-sec">
-  <h2>技术笔记</h2>
-  <a class="more" href="/notes/">全部 →</a>
+  <h2>学习指南</h2>
+  <a class="more" href="/guides/">全部 →</a>
 </div>
 
-<div class="note-links">
+<p class="home-guides-intro">按技术方向整理的学习路径。点进去左侧是目录树，右侧是内容，可以顺着「下一篇」一路读完。</p>
 
-- [Rust 所有权](/notes/rust/ownership) — 借用检查器不是敌人，它只是比我更早地发现了问题
-- [Rust 生命周期](/notes/rust/lifetimes) — 标注不是为了取悦编译器，而是为了把意图说清楚
-- [Docker 与 Caddy](/notes/selfhost/docker-caddy) — 两台命令换一个自动 HTTPS 的站点
-
+<div class="home-guides">
+  <a href="/guides/rust/"><b>Rust</b><span>所有权 · 生命周期 · Trait</span></a>
+  <a href="/guides/python/"><b>Python</b><span>基础语法 · 数据结构 · 异步</span></a>
+  <a href="/guides/docker/"><b>Docker</b><span>镜像分层 · Compose · Caddy</span></a>
+  <a href="/guides/git/"><b>Git</b><span>日常命令 · 分支与合并</span></a>
+  <a href="/guides/sql/"><b>SQL</b><span>基础查询 · 索引优化</span></a>
+  <a href="/guides/linux/"><b>Linux</b><span>Shell · 权限与用户</span></a>
 </div>
+
+<style>
+.home-guides-intro {
+  margin: 0 0 18px;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--vp-c-text-2);
+}
+.home-guides {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.home-guides a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 15px 18px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 11px;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.home-guides a:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+.home-guides b {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  letter-spacing: -0.2px;
+}
+.home-guides a:hover b {
+  color: var(--vp-c-brand-1);
+}
+.home-guides span {
+  font-size: 12.5px;
+  color: var(--vp-c-text-3);
+}
+</style>

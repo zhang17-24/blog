@@ -92,8 +92,8 @@ export default defineConfig({
   },
 
   // README 是给人和 GitHub 看的，不要当成页面渲染；
-  // deploy/ 下是部署配置，也不参与构建
-  srcExclude: ['**/README.md', 'deploy/**'],
+  // deploy/ 是部署配置，docs/ 是内部文档（如发布 SOP），都不参与构建
+  srcExclude: ['**/README.md', 'deploy/**', 'docs/**'],
 
   themeConfig: {
     logo: '/logo.svg',

@@ -20,6 +20,9 @@ npm run preview   # 本地预览构建产物（和线上一致）
 
 ## 日常流程：从写到发布
 
+> 📋 完整版见 **[docs/PUBLISH-SOP.md](docs/PUBLISH-SOP.md)** —— 含前置准备、
+> 发布前检查清单、异常处理（构建失败 / 部署失败 / 紧急回滚）。
+
 四步，前三步都在本地，最后一步自动完成。
 
 ```bash
@@ -74,6 +77,7 @@ git push
 │  │  └─ 03-traits.md
 │  ├─ python/  docker/  git/  sql/  linux/ ...
 ├─ public/                     ← 静态资源，原样拷到根目录
+├─ docs/                       ← 内部文档（发布 SOP 等），不参与构建
 ├─ .vitepress/
 │  ├─ config.mts               ← 站点配置：导航、侧栏、搜索
 │  ├─ site.ts                  ← 站点信息：域名、标题、评论配置

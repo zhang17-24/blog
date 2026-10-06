@@ -40,19 +40,66 @@
 服务器上只需要一个能托管静态文件的 Caddy，**不需要 Node、不需要构建环境**。  
 CI 挂了站点也照常运行。
 
+> 本站实际状态：**已完成部署**，服务器 `<服务器IP>`（腾讯云 Ubuntu 24.04），  
+> 目录 `/opt/blog`，Docker 开机自启已启用，容器 `restart: unless-stopped`。  
+> 服务器重启后站点会自动恢复，不需要人工介入。
+
 ```bash
-# 1. 装 Docker
+# 1. 装 Docker（本站已装好：Docker 29 + Compose v5）
 curl -fsSL https://get.docker.com | sh
 
 # 2. 建目录
-mkdir -p /opt/blog/dist
+sudo mkdir -p /opt/blog/dist && sudo chown $USER:$USER /opt/blog
 
 # 3. 上传 Caddyfile 和 docker-compose.yml
-scp Caddyfile docker-compose.yml root@<服务器>:/opt/blog/
+scp Caddyfile docker-compose.yml <用户>@<服务器>:/opt/blog/
 
-# 4. 改 Caddyfile 里的域名为你的域名，然后启动
-ssh root@<服务器> 'cd /opt/blog && docker compose up -d'
+# 4. 写站点地址配置，然后启动
+ssh <用户>@<服务器> 'printf "SITE_ADDRESS=:80\n" > /opt/blog/.env'
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d'
 ```
+
+#### 站点地址：一份配置支持两种模式
+
+`Caddyfile` 里的站点地址来自环境变量 `SITE_ADDRESS`，**改这个变量就能切换模式**：
+
+| 情况 | `SITE_ADDRESS` | 效果 |
+| --- | --- | --- |
+| 还没域名 | `:80` | 纯 HTTP，用 `http://<服务器IP>` 访问 |
+| 有域名了 | `blog.example.com` | 自动申请并续期 HTTPS 证书 |
+
+不设这个变量会默认用 `:80`，所以忘配也能起来。
+
+#### 域名下来后怎么切到 HTTPS
+
+三步，都在服务器上，**不需要重新构建站点**：
+
+```bash
+# 1. 确认域名 A 记录已指向服务器，且解析生效
+dig +short blog.example.com          # 应返回 <服务器IP>
+
+# 2. 改 .env
+ssh <用户>@<服务器> 'printf "SITE_ADDRESS=blog.example.com\n" > /opt/blog/.env'
+
+# 3. 重建容器让新配置生效
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d --force-recreate web'
+```
+
+然后看证书申请进度：
+
+```bash
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose logs -f web'
+```
+
+看到 `certificate obtained successfully` 就成了。**首次申请需要几秒到几十秒。**
+
+::: warning 切 HTTPS 前必须确认的两件事
+1. **域名已备案**（国内服务器，未备案的域名走 80/443 会被拦截）
+2. **腾讯云安全组放通 443 端口** —— 只开 80 的话，HTTPS 会连不上
+:::
+
+最后别忘了把 `.vitepress/site.ts` 里的 `SITE_URL` 改成 `https://你的域名` 并重新部署，
+否则 RSS / sitemap 里的链接还指向 IP。
 
 ### 1.3 GitHub Secrets（一次性）
 
@@ -459,8 +506,15 @@ npm run preview    # 本地预览构建产物，http://localhost:4173
 git add -A && git commit -m "新增：xxx" && git push    # 发布
 
 ./deploy/deploy.sh                  # 手动部署（不走 CI，本地构建后 rsync）
-docker compose logs -f web          # 服务器上：看日志（含证书申请进度）
-docker compose restart web          # 服务器上：改完 Caddyfile 后重载
+```
+
+**服务器侧命令**（本站：`<用户>@<服务器>`，目录 `/opt/blog`）：
+
+```bash
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose ps'            # 看容器状态
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose logs -f web'   # 看日志（含证书申请）
+ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d --force-recreate web'  # 改完配置生效
+ssh <用户>@<服务器> 'df -h /'                                      # 看磁盘
 ```
 
 ### 5.3 目录约定
@@ -496,8 +550,8 @@ blog/
 ### 5.5 什么情况**不要**走这个流程
 
 - **只改错别字**：可以直接在 GitHub 网页上编辑文件并提交，CI 一样会跑
-- **改服务器配置**（Caddyfile）：这是服务器侧的事，不经过 CI，  
-  需要手动 `scp` 上去 + `docker compose restart web`
+- **改服务器配置**（`Caddyfile` / `.env`）：这是服务器侧的事，不经过 CI。  
+  改完 `scp` 上去，再 `docker compose up -d --force-recreate web` 让配置生效
 - **改 CI 配置本身**（`.github/workflows/`）：推送后 CI 会用它自己跑一遍，  
   如果写错了 CI 会失败，站点保持上一版不变（不会挂）
 
@@ -505,4 +559,24 @@ blog/
 
 ## 附：流程图（纯文本版，方便贴到别处）
 
-<span style="background-color:rgb(243, 245, 247)"><服务器IP></span>
+```
+[1] npm run dev
+     ↓
+[2] 写 posts/xxx.md 或 guides/<技术>/NN-xxx.md
+     ↓
+[3] 对照检查清单自查
+     ↓
+[4] npm run build  ← 必须通过（查死链 + 生成 RSS）
+     ↓
+[5] git add -A && git commit -m "新增：xxx"
+     ↓
+[6] git push  ──────→ GitHub Actions
+                          ↓
+                     npm ci && npm run build
+                          ↓
+                     rsync → 服务器 /opt/blog/dist/
+                          ↓
+                     Caddy 直接托管，无需重启
+     ↓
+[7] 线上验收：curl 状态码 + 浏览器逐项确认
+```

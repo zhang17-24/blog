@@ -2,9 +2,9 @@
 
 > 标准作业程序 · 从写一篇内容到它在线上可访问
 >
-> 适用对象：本站维护者
-> 触发条件：要发布一篇新文章 / 一个新指南章节 / 一次站点改动
-> 预计耗时：写作之外，发布动作约 3 分钟（其中 CI 跑 1~2 分钟）
+> 适用对象：本站维护者  
+> 触发条件：要发布一篇新文章 / 一个新指南章节 / 一次站点改动  
+> 预计耗时：写作之外，发布动作约 3 分钟（其中 CI 跑 1~2 分钟）  
 > 最后更新：2026-10-06
 
 ---
@@ -13,7 +13,7 @@
 
 **在本地写 → 本地自查 → 提交推送 → CI 自动构建并同步到服务器 → 线上验收。**
 
-全流程只有「提交推送」这一步会产生对外影响。前面所有步骤都只发生在你自己的电脑上，
+全流程只有「提交推送」这一步会产生对外影响。前面所有步骤都只发生在你自己的电脑上，  
 写砸了、写一半、改主意了，都不会被别人看到。
 
 ```
@@ -29,15 +29,15 @@
 
 ### 1.1 本地环境
 
-| 项目 | 要求 | 检查命令 |
-| --- | --- | --- |
-| Node | 18+，推荐 22（仓库有 `.nvmrc`） | `node -v` |
-| 依赖 | 已安装 | `npm install` |
-| Git | 已配置 remote | `git remote -v` |
+| 项目   | 要求                      | 检查命令            |
+| ---- | ----------------------- | --------------- |
+| Node | 18+，推荐 22（仓库有 `.nvmrc`） | `node -v`       |
+| 依赖   | 已安装                     | `npm install`   |
+| Git  | 已配置 remote              | `git remote -v` |
 
 ### 1.2 服务器（一次性）
 
-服务器上只需要一个能托管静态文件的 Caddy，**不需要 Node、不需要构建环境**。
+服务器上只需要一个能托管静态文件的 Caddy，**不需要 Node、不需要构建环境**。  
 CI 挂了站点也照常运行。
 
 ```bash
@@ -65,13 +65,13 @@ ssh-copy-id -i ~/.ssh/blog_deploy.pub root@<服务器>
 
 打开 GitHub 仓库 → **Settings → Secrets and variables → Actions**，添加：
 
-| Secret 名 | 说明 | 必填 |
-| --- | --- | --- |
-| `DEPLOY_HOST` | 服务器 IP 或域名 | 是 |
-| `DEPLOY_USER` | SSH 用户名 | 是 |
-| `DEPLOY_PATH` | 静态文件目录，如 `/opt/blog/dist/` | 是 |
-| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 是 |
-| `DEPLOY_PORT` | SSH 端口，默认 22 | 否 |
+| Secret 名         | 说明                            | 必填 |
+| ---------------- | ----------------------------- | -- |
+| `DEPLOY_HOST`    | 服务器 IP 或域名                    | 是  |
+| `DEPLOY_USER`    | SSH 用户名                       | 是  |
+| `DEPLOY_PATH`    | 静态文件目录，如 `/opt/blog/dist/`    | 是  |
+| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 是  |
+| `DEPLOY_PORT`    | SSH 端口，默认 22                  | 否  |
 
 > 私钥全文用 `cat ~/.ssh/blog_deploy` 拿到，含 `-----BEGIN` 到 `-----END` 全部行。
 
@@ -119,7 +119,7 @@ description: 一句话摘要，会显示在列表里。不写则自动截取正�
 正文从这里开始。
 ```
 
-**判据：只有同时写了 `title` 和 `date` 的文件才会进文章列表。**
+**判据：只有同时写了 `title` 和 `date` 的文件才会进文章列表。**  
 所以 `posts/` 下可以放心放草稿、素材、说明页，只要不写 `date` 就不会被收录。
 
 #### 情况 B：写一个指南章节
@@ -227,7 +227,7 @@ git commit -m "新增：Rust 指南所有权章节"
 修复：<修了什么>
 ```
 
-> 检查 `git status` 时如果看到 `*.timestamp-*.mjs`，说明 `.gitignore` 失效了，
+> 检查 `git status` 时如果看到 `*.timestamp-*.mjs`，说明 `.gitignore` 失效了，  
 > 那是 VitePress 加载 TS 配置时的临时文件，不该提交。
 
 ### Step 6 · 推送并观察 CI
@@ -292,9 +292,9 @@ curl -s -o /dev/null -w "%{http_code}\n" https://<你的域名>/posts/新文章s
 
 ### 代码块
 
-- [ ] 每个代码块都标了语言（```bash / ```ts / ```md）
-- [ ] **语言标记是 Shiki 内置的** —— `caddy`、`gitignore`、`ini` 不是内置的，
-      会 fallback 成纯文本并刷一屏警告。用 `txt` 或最接近的内置语言代替
+- [ ] 每个代码块都标了语言（`bash / `ts / \`\`\`md）
+- [ ] **语言标记是 Shiki 内置的** —— `caddy`、`gitignore`、`ini` 不是内置的，  
+  会 fallback 成纯文本并刷一屏警告。用 `txt` 或最接近的内置语言代替
 - [ ] 长命令没有超出容器宽度（会出横向滚动条）
 
 ### 元信息
@@ -319,7 +319,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://<你的域名>/posts/新文章s
 
 1. 检查路径拼写，注意**不要带 `.html`**
 2. 确认目标文件真的存在，且不是被 `srcExclude` 排除了
-3. 如果是**故意**的占位链接（比如指向还没写的文章），临时在 config 里加
+3. 如果是**故意**的占位链接（比如指向还没写的文章），临时在 config 里加  
    `ignoreDeadLinks: true` —— 但**不要长期开着**，死链检查是很有价值的护栏
 
 ### 4.2 构建警告：Shiki 语言未加载
@@ -350,7 +350,7 @@ ssh-copy-id -i ~/.ssh/blog_deploy.pub root@<服务器>
 
 **原因**：workflow 里的 `ssh-keyscan` 没抓到，或服务器换了主机密钥。
 
-**处理**：在 workflow 的「配置 SSH」步骤里临时加 `-o StrictHostKeyChecking=no`
+**处理**：在 workflow 的「配置 SSH」步骤里临时加 `-o StrictHostKeyChecking=no`  
 （仅排障用，长期开着有中间人风险）。
 
 ### 4.5 部署成功但线上是旧内容
@@ -371,7 +371,7 @@ ssh-copy-id -i ~/.ssh/blog_deploy.pub root@<服务器>
 
 ### 4.6 站点打不开 / 证书没签下来
 
-**原因**：Caddy 申请 Let's Encrypt 证书失败。常见于域名没解析到服务器、
+**原因**：Caddy 申请 Let's Encrypt 证书失败。常见于域名没解析到服务器、  
 或 80 端口没放通。
 
 **处理**：
@@ -388,7 +388,7 @@ ssh root@<服务器> 'cd /opt/blog && docker compose logs -f web'
 
 ### 4.7 页面 404（其他页面正常）
 
-**原因**：`cleanUrls: true` 时 `/posts/hello` 对应 `posts/hello.html`，
+**原因**：`cleanUrls: true` 时 `/posts/hello` 对应 `posts/hello.html`，  
 服务器必须有 `try_files` 兜底。
 
 **处理**：确认 Caddyfile 里有这一行：
@@ -410,10 +410,10 @@ git push
 
 CI 会自动把回滚后的版本部署上去，1~2 分钟后线上恢复。
 
-> **不要用 `git reset --hard` + `git push --force`** —— 会改写历史，
+> **不要用 `git reset --hard` + `git push --force`** —— 会改写历史，  
 > 而且 CI 可能因为 concurrency 取消而处于不确定状态。`revert` 更安全。
 
-**整个站点挂了**：去服务器把静态目录换成上一版备份，或直接 `docker compose down`
+**整个站点挂了**：去服务器把静态目录换成上一版备份，或直接 `docker compose down`  
 先止损，再排查。
 
 ---
@@ -424,29 +424,29 @@ CI 会自动把回滚后的版本部署上去，1~2 分钟后线上恢复。
 
 **文章（`posts/*.md`）**
 
-| 字段 | 作用 | 必填 |
-| --- | --- | --- |
-| `title` | 文章标题 | **是** |
-| `date` | 发布日期，`YYYY-MM-DD` | **是**（不写就不进列表） |
-| `tags` | 标签数组，`[随笔, 工具]` | 否 |
-| `description` | 列表摘要、RSS 描述 | 否（自动截取正文前 110 字） |
+| 字段            | 作用                | 必填               |
+| ------------- | ----------------- | ---------------- |
+| `title`       | 文章标题              | **是**            |
+| `date`        | 发布日期，`YYYY-MM-DD` | **是**（不写就不进列表）   |
+| `tags`        | 标签数组，`[随笔, 工具]`   | 否                |
+| `description` | 列表摘要、RSS 描述       | 否（自动截取正文前 110 字） |
 
 **指南概览页（`guides/<技术>/index.md`）**
 
-| 字段 | 作用 | 必填 |
-| --- | --- | --- |
-| `title` | 左侧目录树里的分组名 | **是** |
-| `description` | 总览卡片的简介 | 否 |
-| `order` | 分组排序（小的在前） | 否（默认 99） |
+| 字段            | 作用         | 必填       |
+| ------------- | ---------- | -------- |
+| `title`       | 左侧目录树里的分组名 | **是**    |
+| `description` | 总览卡片的简介    | 否        |
+| `order`       | 分组排序（小的在前） | 否（默认 99） |
 
 **指南章节（`guides/<技术>/NN-xxx.md`）**
 
-| 字段 | 作用 | 必填 |
-| --- | --- | --- |
-| `title` | 左侧目录树里的章节名 | **是** |
-| `description` | 章节简介 | 否 |
+| 字段            | 作用         | 必填    |
+| ------------- | ---------- | ----- |
+| `title`       | 左侧目录树里的章节名 | **是** |
+| `description` | 章节简介       | 否     |
 
-> 章节顺序由**文件名前缀**决定（`01-`、`02-`），前缀只影响排序，
+> 章节顺序由**文件名前缀**决定（`01-`、`02-`），前缀只影响排序，  
 > 侧栏显示的是 `title`。
 
 ### 5.2 命令速查
@@ -488,41 +488,21 @@ blog/
 ### 5.4 发布节奏建议
 
 - **当天写、当天发**：写完立刻走流程，3 分钟就上线，别攒着
-- **系列文章**：同一主题的拆成多篇时，建议**一次 push 一起发**，
+- **系列文章**：同一主题的拆成多篇时，建议**一次 push 一起发**，  
   避免读者点进去发现「下一篇」是空的
-- **大改动**（改配色、改导航、加功能）：先在 `npm run preview` 里过一遍，
+- **大改动**（改配色、改导航、加功能）：先在 `npm run preview` 里过一遍，  
   再推。这类改动影响面比单篇文章大得多
 
 ### 5.5 什么情况**不要**走这个流程
 
 - **只改错别字**：可以直接在 GitHub 网页上编辑文件并提交，CI 一样会跑
-- **改服务器配置**（Caddyfile）：这是服务器侧的事，不经过 CI，
+- **改服务器配置**（Caddyfile）：这是服务器侧的事，不经过 CI，  
   需要手动 `scp` 上去 + `docker compose restart web`
-- **改 CI 配置本身**（`.github/workflows/`）：推送后 CI 会用它自己跑一遍，
+- **改 CI 配置本身**（`.github/workflows/`）：推送后 CI 会用它自己跑一遍，  
   如果写错了 CI 会失败，站点保持上一版不变（不会挂）
 
 ---
 
 ## 附：流程图（纯文本版，方便贴到别处）
 
-```
-[1] npm run dev
-     ↓
-[2] 写 posts/xxx.md 或 guides/<技术>/NN-xxx.md
-     ↓
-[3] 对照检查清单自查
-     ↓
-[4] npm run build  ← 必须通过（查死链 + 生成 RSS）
-     ↓
-[5] git add -A && git commit -m "新增：xxx"
-     ↓
-[6] git push  ──────→ GitHub Actions
-                          ↓
-                     npm ci && npm run build
-                          ↓
-                     rsync → 服务器 /opt/blog/dist/
-                          ↓
-                     Caddy 直接托管，无需重启
-     ↓
-[7] 线上验收：curl 状态码 + 浏览器逐项确认
-```
+<span style="background-color:rgb(243, 245, 247)"><服务器IP></span>

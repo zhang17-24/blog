@@ -1,10 +1,11 @@
 # 服务器上只需要跑这个 —— 静态文件 + 自动 HTTPS
 # 用法：docker compose up -d
 #
-# 首次部署前先准备好：
-#   1. 域名 A 记录指向这台服务器
-#   2. 80 / 443 端口没被别的服务占用
-#   3. 把 Caddyfile 里的域名改成你自己的
+# 站点地址在 .env 里配置（同目录）：
+#   还没域名 → SITE_ADDRESS=:80        然后用 http://<服务器IP> 访问
+#   有域名了 → SITE_ADDRESS=blog.example.com   自动申请 HTTPS 证书
+#
+# 改完 .env 后执行：docker compose up -d --force-recreate web
 
 services:
   web:
@@ -14,7 +15,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp" # HTTP/3
+      - "443:443/udp" # HTTP/3（纯 HTTP 模式下用不到，留着不影响）
+    environment:
+      # 默认 :80 —— 没配 .env 也能起来，用 IP 直接访问
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./dist:/srv/blog:ro

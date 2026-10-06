@@ -3,7 +3,12 @@
  */
 
 // 部署后的正式域名（末尾不要带斜杠），影响 RSS、sitemap、og 标签
-export const SITE_URL = 'https://blog.example.com'
+//
+// 域名还没备案下来时，先填服务器 IP（纯 HTTP），保证 RSS / sitemap 里的链接能用：
+//   export const SITE_URL = 'http://<服务器IP>'
+// 域名下来、HTTPS 配好后换成：
+//   export const SITE_URL = 'https://你的域名'
+export const SITE_URL = 'http://<服务器IP>'
 
 export const SITE_TITLE = '流沙'
 export const SITE_DESC = '写代码，也写生活。'

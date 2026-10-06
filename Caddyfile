@@ -1,5 +1,17 @@
-# 把 blog.example.com 换成你自己的域名，Caddy 会自动申请并续期 HTTPS 证书
-blog.example.com {
+# ============================================================
+# 站点地址由环境变量 SITE_ADDRESS 控制，一份配置支持两种模式：
+#
+#   有域名（自动申请并续期 HTTPS 证书）：
+#     SITE_ADDRESS=blog.example.com
+#
+#   还没域名（纯 HTTP，用 IP 访问，等域名备案下来再切）：
+#     SITE_ADDRESS=:80
+#
+# 默认值是 :80 —— 没配置也能跑起来，不会因为忘设变量而启动失败。
+# 切换方式：改服务器上 /opt/blog/.env 里的这一行，然后
+#   docker compose up -d --force-recreate web
+# ============================================================
+{$SITE_ADDRESS::80} {
 	root * /srv/blog
 
 	# 压缩传输

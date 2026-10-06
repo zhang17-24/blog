@@ -103,24 +103,32 @@ ssh <用户>@<服务器> 'cd /opt/blog && docker compose logs -f web'
 
 ### 1.3 GitHub Secrets（一次性）
 
+> **本站状态：已配置完成**，4 个 Secret 都已写入 `zhang17-24/blog`。  
+> 部署专用密钥在本地 `~/.ssh/blog_deploy`，公钥已加入服务器 `ubuntu` 用户的 authorized_keys。  
+> 下面这段是记录当初怎么做的，**不需要重做**。
+
 生成部署专用密钥 —— **不要复用你平时的私钥**：
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/blog_deploy -C "github-actions"
-ssh-copy-id -i ~/.ssh/blog_deploy.pub root@<服务器>
+# 本站实际执行过的命令（用户是 ubuntu，不是 root）
+ssh-keygen -t ed25519 -f ~/.ssh/blog_deploy -N "" -C "github-actions-blog-deploy"
+ssh-copy-id -i ~/.ssh/blog_deploy.pub <用户>@<服务器>
 ```
 
 打开 GitHub 仓库 → **Settings → Secrets and variables → Actions**，添加：
 
-| Secret 名         | 说明                            | 必填 |
-| ---------------- | ----------------------------- | -- |
-| `DEPLOY_HOST`    | 服务器 IP 或域名                    | 是  |
-| `DEPLOY_USER`    | SSH 用户名                       | 是  |
-| `DEPLOY_PATH`    | 静态文件目录，如 `/opt/blog/dist/`    | 是  |
-| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 是  |
-| `DEPLOY_PORT`    | SSH 端口，默认 22                  | 否  |
+| Secret 名 | 说明 | 本站实际值 |
+| --- | --- | --- |
+| `DEPLOY_HOST` | 服务器 IP 或域名 | `<服务器IP>` |
+| `DEPLOY_USER` | SSH 用户名 | `ubuntu` |
+| `DEPLOY_PATH` | 静态文件目录 | `/opt/blog/dist/` |
+| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 已配置（418 字符） |
+| `DEPLOY_PORT` | SSH 端口，默认 22 | 未设置（用默认 22） |
 
 > 私钥全文用 `cat ~/.ssh/blog_deploy` 拿到，含 `-----BEGIN` 到 `-----END` 全部行。
+>
+> 配置密钥这一步用命令行做也行 —— GitHub 要求用仓库公钥做 libsodium sealed box 加密，
+> Python 里 `PyNaCl` 的 `SealedBox` 可以直接干这件事。
 
 ### 1.4 改站点信息（首次发布前必须做）
 
@@ -133,6 +141,9 @@ export const SITE_DESC = '写代码，也写生活。'
 ```
 
 `SITE_URL` 会影响 RSS、sitemap 和 og 标签，**不改成真实域名，RSS 订阅者拿到的链接是错的**。
+
+> 本站当前是 `http://<服务器IP>`（域名还没备案下来），
+> 域名可用后记得改成 `https://你的域名` 并重新部署。
 
 ---
 

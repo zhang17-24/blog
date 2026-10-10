@@ -22,6 +22,9 @@ npm run preview   # 本地预览构建产物（和线上一致）
 
 > 📋 完整版见 **[docs/PUBLISH-SOP.md](docs/PUBLISH-SOP.md)** —— 含前置准备、
 > 发布前检查清单、异常处理（构建失败 / 部署失败 / 紧急回滚）。
+>
+> 🌐 域名与 HTTPS 见 **[docs/DOMAIN-SETUP.md](docs/DOMAIN-SETUP.md)** —— 备案资格体检、
+> 从「IP + HTTP」切到「域名 + HTTPS」的完整步骤。当前域名 `claspmoon.cn` 待备案。
 
 四步，前三步都在本地，最后一步自动完成。
 
@@ -77,7 +80,9 @@ git push
 │  │  └─ 03-traits.md
 │  ├─ python/  docker/  git/  sql/  linux/ ...
 ├─ public/                     ← 静态资源，原样拷到根目录
-├─ docs/                       ← 内部文档（发布 SOP 等），不参与构建
+├─ docs/                       ← 内部文档，不参与构建
+│  ├─ PUBLISH-SOP.md           ← 发布流程标准作业程序
+│  └─ DOMAIN-SETUP.md          ← 域名备案与 HTTPS 切换指南
 ├─ .vitepress/
 │  ├─ config.mts               ← 站点配置：导航、侧栏、搜索
 │  ├─ site.ts                  ← 站点信息：域名、标题、评论配置

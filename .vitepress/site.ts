@@ -4,10 +4,15 @@
 
 // 部署后的正式域名（末尾不要带斜杠），影响 RSS、sitemap、og 标签
 //
-// 域名还没备案下来时，先填服务器 IP（纯 HTTP），保证 RSS / sitemap 里的链接能用：
+// 域名 claspmoon.cn 已注册并实名认证，但还没完成 ICP 备案，
+// 未备案的域名指向国内服务器会被拦截，所以暂时先用服务器 IP（纯 HTTP），
+// 保证 RSS / sitemap 里的链接可用：
 //   export const SITE_URL = 'http://<服务器IP>'
-// 域名下来、HTTPS 配好后换成：
-//   export const SITE_URL = 'https://你的域名'
+//
+// 备案通过、HTTPS 配好后换成：
+//   export const SITE_URL = 'https://claspmoon.cn'
+//
+// 备案与切换的完整步骤见 docs/DOMAIN-SETUP.md
 export const SITE_URL = 'http://<服务器IP>'
 
 export const SITE_TITLE = '流沙'

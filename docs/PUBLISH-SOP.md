@@ -66,7 +66,8 @@ ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d'
 | 情况 | `SITE_ADDRESS` | 效果 |
 | --- | --- | --- |
 | 还没域名 | `:80` | 纯 HTTP，用 `http://<服务器IP>` 访问 |
-| 有域名了 | `blog.example.com` | 自动申请并续期 HTTPS 证书 |
+| 有域名了 | `claspmoon.cn` | 自动申请并续期 HTTPS 证书 |
+| 主域 + www | `claspmoon.cn, www.claspmoon.cn` | 多域名用**逗号分隔**，两个都签证书 |
 
 不设这个变量会默认用 `:80`，所以忘配也能起来。
 
@@ -76,10 +77,11 @@ ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d'
 
 ```bash
 # 1. 确认域名 A 记录已指向服务器，且解析生效
-dig +short blog.example.com          # 应返回 <服务器IP>
+dig +short claspmoon.cn              # 应返回 <服务器IP>
 
 # 2. 改 .env
-ssh <用户>@<服务器> 'printf "SITE_ADDRESS=blog.example.com\n" > /opt/blog/.env'
+ssh <用户>@<服务器> \
+  'cd /opt/blog && sed -i "s|^SITE_ADDRESS=.*|SITE_ADDRESS=claspmoon.cn, www.claspmoon.cn|" .env && cat .env'
 
 # 3. 重建容器让新配置生效
 ssh <用户>@<服务器> 'cd /opt/blog && docker compose up -d --force-recreate web'
@@ -94,12 +96,17 @@ ssh <用户>@<服务器> 'cd /opt/blog && docker compose logs -f web'
 看到 `certificate obtained successfully` 就成了。**首次申请需要几秒到几十秒。**
 
 ::: warning 切 HTTPS 前必须确认的两件事
-1. **域名已备案**（国内服务器，未备案的域名走 80/443 会被拦截）
-2. **腾讯云安全组放通 443 端口** —— 只开 80 的话，HTTPS 会连不上
+1. **域名已完成 ICP 备案**（国内服务器，未备案的域名走 80/443 会被拦截）
+2. 443 端口放通 —— 本站已实测放通（`curl` 返回 `Connection refused` 而非超时，
+   说明安全组没拦，只是当时无服务监听），**不需要改安全组**
 :::
 
-最后别忘了把 `.vitepress/site.ts` 里的 `SITE_URL` 改成 `https://你的域名` 并重新部署，
+最后别忘了把 `.vitepress/site.ts` 里的 `SITE_URL` 改成 `https://claspmoon.cn` 并重新部署，
 否则 RSS / sitemap 里的链接还指向 IP。
+
+> **本站域名现状（2026-10-10 核查）**：`claspmoon.cn` 已注册、已实名认证，
+> 但**备案未完成**，且服务器当前是**按量计费**（不满足备案条件）。
+> 完整的诊断、阻塞项分析和操作步骤见 **[`docs/DOMAIN-SETUP.md`](./DOMAIN-SETUP.md)**。
 
 ### 1.3 GitHub Secrets（一次性）
 
@@ -135,14 +142,14 @@ ssh-copy-id -i ~/.ssh/blog_deploy.pub <用户>@<服务器>
 打开 `.vitepress/site.ts`：
 
 ```ts
-export const SITE_URL = 'https://blog.example.com'  // ← 换成你的域名
+export const SITE_URL = 'https://claspmoon.cn'   // ← 换成你的域名
 export const SITE_TITLE = '流沙'
 export const SITE_DESC = '写代码，也写生活。'
 ```
 
 `SITE_URL` 会影响 RSS、sitemap 和 og 标签，**不改成真实域名，RSS 订阅者拿到的链接是错的**。
 
-> 本站当前是 `http://<服务器IP>`（域名还没备案下来），
+> 本站当前是 `http://<服务器IP>`（域名 `claspmoon.cn` 还没完成 ICP 备案），
 > 域名可用后记得改成 `https://你的域名` 并重新部署。
 
 ---

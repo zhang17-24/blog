@@ -5,6 +5,9 @@ import TagIndex from './components/TagIndex.vue'
 import ArchiveList from './components/ArchiveList.vue'
 import GuideIndex from './components/GuideIndex.vue'
 import Comment from './components/Comment.vue'
+// KaTeX 样式与字体 —— 公式渲染靠 config.mts 里的 markdown-it-katex 插件，
+// 但样式必须在这里引一次，否则公式会渲染成裸的 HTML 没有排版
+import 'katex/dist/katex.min.css'
 import './style.css'
 
 /**

@@ -2,9 +2,18 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
+import katexModule from '@vscode/markdown-it-katex'
 import { genFeed } from './theme/build-hooks'
 import { buildGuideSidebar } from './guides'
 import { SITE_URL, SITE_TITLE, SITE_DESC } from './site'
+
+/**
+ * markdown-it-katex 是 CJS 包（exports.default = 插件函数）。
+ * config.mts 走 esbuild 编译，import 默认导入拿到的可能是命名空间对象
+ * 而不是函数本身，直接 md.use() 会报 "plugin.apply is not a function"。
+ * 这里两种形态都兜住。
+ */
+const katexPlugin: any = (katexModule as any)?.default ?? katexModule
 
 /**
  * 中文本地搜索分词器
@@ -88,12 +97,45 @@ export default defineConfig({
   sitemap: { hostname: SITE_URL },
 
   markdown: {
-    lineNumbers: true
+    lineNumbers: true,
+
+    /**
+     * 数学公式（KaTeX）
+     *
+     * 指南里的公式很多（深度学习那套有 300+ 块级、1000+ 行内），
+     * VitePress 默认不认 $...$，会原样输出，所以必须挂这个插件。
+     *
+     * 选 KaTeX 不选 MathJax：构建时渲染，公式量上千，KaTeX 快一个数量级。
+     * 样式（katex.min.css）在 theme/index.ts 里引，字体随构建产物一起打包。
+     *
+     * strict：正文里有 \text{欠拟合} 这类写法（公式里嵌中文），
+     * KaTeX 默认会为每个中文字符打一条 unicodeTextInMathMode 警告，
+     * 一次构建刷几十行。只忽略这一类，其他语法问题照常报警。
+     */
+    config: (md) => {
+      md.use(katexPlugin, {
+        strict: (errorCode: string) =>
+          errorCode === 'unicodeTextInMathMode' ? 'ignore' : 'warn'
+      })
+    }
   },
 
   // README 是给人和 GitHub 看的，不要当成页面渲染；
   // deploy/ 是部署配置，docs/ 是内部文档（如发布 SOP），都不参与构建
   srcExclude: ['**/README.md', 'deploy/**', 'docs/**'],
+
+  /**
+   * /downloads/ 下放的是可下载的静态文件（源码、手册等），不是页面。
+   *
+   * 为什么要忽略：VitePress 判断链接是否「死链」时，会先看扩展名在不在
+   * 它的静态资源白名单里（zip/pdf/txt/csv/json/svg…）。`.py` 不在名单里，
+   * 于是被当成页面去校验，去找 public/downloads/xxx.py.html —— 当然找不到，
+   * 构建直接报 dead link 失败。`.html` 因为会走「补 .html 再找」的分支而侥幸通过。
+   *
+   * 链接本身没问题：cleanUrls 已开启，渲染出来的 href 就是 /downloads/xxx.py。
+   * 所以这里只是让死链检查放行这个目录，新增 .py / .ipynb / .sh 等文件都不用再改配置。
+   */
+  ignoreDeadLinks: [/^\/downloads\//],
 
   themeConfig: {
     logo: '/logo.svg',

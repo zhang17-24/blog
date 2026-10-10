@@ -44,6 +44,9 @@ export default createContentLoader('guides/**/*.md', {
         g.name = String(fm.title ?? dir)
         g.desc = String(fm.description ?? '')
         g.order = Number(fm.order ?? 99)
+      } else if (rest.endsWith('/')) {
+        // 二级分组（Part）的 index.md —— 不进卡片列表，
+        // 卡片只列真正能读的章节，Part 层级交给左侧目录树表达
       } else {
         g.chapters.push({
           text: String(fm.title ?? p.url),

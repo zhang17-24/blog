@@ -40,7 +40,7 @@
 服务器上只需要一个能托管静态文件的 Caddy，**不需要 Node、不需要构建环境**。  
 CI 挂了站点也照常运行。
 
-> 本站实际状态：**已完成部署**，服务器 `<服务器IP>`（腾讯云 Ubuntu 24.04），  
+> 本站实际状态：**已完成部署**，腾讯云 Ubuntu 24.04，  
 > 目录 `/opt/blog`，Docker 开机自启已启用，容器 `restart: unless-stopped`。  
 > 服务器重启后站点会自动恢复，不需要人工介入。
 
@@ -104,20 +104,60 @@ ssh <用户>@<服务器> 'cd /opt/blog && docker compose logs -f web'
 最后别忘了把 `.vitepress/site.ts` 里的 `SITE_URL` 改成 `https://claspmoon.cn` 并重新部署，
 否则 RSS / sitemap 里的链接还指向 IP。
 
-> **本站域名现状（2026-10-10 核查）**：`claspmoon.cn` 已注册、已实名认证，
-> 但**备案未完成**，且服务器当前是**按量计费**（不满足备案条件）。
-> 完整的诊断、阻塞项分析和操作步骤见 **[`docs/DOMAIN-SETUP.md`](./DOMAIN-SETUP.md)**。
+> **本站状态：已完成**（2026-10-10）。`claspmoon.cn` + `www.claspmoon.cn` 均已签好
+> Let's Encrypt 证书，HTTP 自动 308 跳 HTTPS。
+>
+> ⚠️ 切换后**访问服务器 IP 会打不开**（308 跳到只有域名证书的 HTTPS），这是正常现象。
+> 想验证服务本身是否正常，用 `curl -sI -H "Host: claspmoon.cn" http://127.0.0.1/`。
+>
+> 备案要求、证书排障、换域名做法见 **[`docs/DOMAIN-SETUP.md`](./DOMAIN-SETUP.md)**。
+
+#### 服务器 SSH 加固（建议每台新机器都做）
+
+默认的 Ubuntu 云主机开着密码登录，会被持续暴力破解（本站实测 7 天收到 8554 次尝试）。
+关掉密码登录即可根治：
+
+```bash
+# 备份
+sudo cp -a /etc/ssh/sshd_config /etc/ssh/sshd_config.bak.$(date +%Y%m%d-%H%M%S)
+
+# 写一个 00- 开头的 drop-in（sshd 对同一参数取「第一个出现的值」，
+# 所以它优先于 cloud-init 生成的 50-cloud-init.conf，机器重启也不会被覆盖）
+sudo tee /etc/ssh/sshd_config.d/00-hardening.conf > /dev/null <<'CONF'
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin prohibit-password
+PubkeyAuthentication yes
+CONF
+sudo chmod 600 /etc/ssh/sshd_config.d/00-hardening.conf
+
+# 校验语法后重载
+sudo sshd -t && sudo systemctl reload ssh
+
+# 确认生效
+sudo sshd -T | grep -iE '^(passwordauthentication|permitrootlogin)'
+```
+
+> **务必先确认密钥登录可用再动手**。改完后验证：
+>
+> ```bash
+> ssh -o BatchMode=yes <用户>@<服务器> 'echo ok'                    # 应该成功
+> ssh -o BatchMode=yes -o PubkeyAuthentication=no -o PreferredAuthentications=password \
+>     <用户>@<服务器> 'echo 不该成功'                                # 应该被拒绝
+> ```
+>
+> 别忘了 CI 用的部署密钥也要能连（`ssh -i ~/.ssh/blog_deploy ...`）。
 
 ### 1.3 GitHub Secrets（一次性）
 
 > **本站状态：已配置完成**，4 个 Secret 都已写入 `zhang17-24/blog`。  
-> 部署专用密钥在本地 `~/.ssh/blog_deploy`，公钥已加入服务器 `ubuntu` 用户的 authorized_keys。  
+> 部署专用密钥在本地 `~/.ssh/blog_deploy`，公钥已加入服务器的 authorized_keys。  
 > 下面这段是记录当初怎么做的，**不需要重做**。
 
 生成部署专用密钥 —— **不要复用你平时的私钥**：
 
 ```bash
-# 本站实际执行过的命令（用户是 ubuntu，不是 root）
+# 本站实际执行过的命令（SSH 用户不是 root）
 ssh-keygen -t ed25519 -f ~/.ssh/blog_deploy -N "" -C "github-actions-blog-deploy"
 ssh-copy-id -i ~/.ssh/blog_deploy.pub <用户>@<服务器>
 ```
@@ -126,10 +166,10 @@ ssh-copy-id -i ~/.ssh/blog_deploy.pub <用户>@<服务器>
 
 | Secret 名 | 说明 | 本站实际值 |
 | --- | --- | --- |
-| `DEPLOY_HOST` | 服务器 IP 或域名 | `<服务器IP>` |
-| `DEPLOY_USER` | SSH 用户名 | `ubuntu` |
+| `DEPLOY_HOST` | 服务器 IP 或域名 | 已配置 |
+| `DEPLOY_USER` | SSH 用户名 | 已配置 |
 | `DEPLOY_PATH` | 静态文件目录 | `/opt/blog/dist/` |
-| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 已配置（418 字符） |
+| `DEPLOY_SSH_KEY` | `~/.ssh/blog_deploy` **私钥全文** | 已配置 |
 | `DEPLOY_PORT` | SSH 端口，默认 22 | 未设置（用默认 22） |
 
 > 私钥全文用 `cat ~/.ssh/blog_deploy` 拿到，含 `-----BEGIN` 到 `-----END` 全部行。
@@ -149,8 +189,7 @@ export const SITE_DESC = '写代码，也写生活。'
 
 `SITE_URL` 会影响 RSS、sitemap 和 og 标签，**不改成真实域名，RSS 订阅者拿到的链接是错的**。
 
-> 本站当前是 `http://<服务器IP>`（域名 `claspmoon.cn` 还没完成 ICP 备案），
-> 域名可用后记得改成 `https://你的域名` 并重新部署。
+> 本站当前使用 `https://claspmoon.cn`，HTTPS 与证书自动续期均已就绪。
 
 ---
 
@@ -526,7 +565,7 @@ git add -A && git commit -m "新增：xxx" && git push    # 发布
 ./deploy/deploy.sh                  # 手动部署（不走 CI，本地构建后 rsync）
 ```
 
-**服务器侧命令**（本站：`<用户>@<服务器>`，目录 `/opt/blog`）：
+**服务器侧命令**（本站目录 `/opt/blog`，连接信息见 `deploy/deploy.env`）：
 
 ```bash
 ssh <用户>@<服务器> 'cd /opt/blog && docker compose ps'            # 看容器状态

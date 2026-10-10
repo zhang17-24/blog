@@ -2,18 +2,12 @@
  * 站点级常量：改这里就够了
  */
 
-// 部署后的正式域名（末尾不要带斜杠），影响 RSS、sitemap、og 标签
+// 站点正式地址（末尾不要带斜杠），影响 RSS、sitemap、og 标签
 //
-// 域名 claspmoon.cn 已注册并实名认证，但还没完成 ICP 备案，
-// 未备案的域名指向国内服务器会被拦截，所以暂时先用服务器 IP（纯 HTTP），
-// 保证 RSS / sitemap 里的链接可用：
-//   export const SITE_URL = 'http://<服务器IP>'
-//
-// 备案通过、HTTPS 配好后换成：
-//   export const SITE_URL = 'https://claspmoon.cn'
-//
-// 备案与切换的完整步骤见 docs/DOMAIN-SETUP.md
-export const SITE_URL = 'http://<服务器IP>'
+// 这里必须填**对外可访问的正式地址**，不要填服务器 IP。
+// 原因：Caddy 会把 HTTP 请求 308 跳到 HTTPS，而证书只签给域名，
+// 填 IP 会让 RSS 订阅者和搜索引擎拿到打不开的链接。
+export const SITE_URL = 'https://claspmoon.cn'
 
 export const SITE_TITLE = '流沙'
 export const SITE_DESC = '写代码，也写生活。'

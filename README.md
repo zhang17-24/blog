@@ -23,8 +23,8 @@ npm run preview   # 本地预览构建产物（和线上一致）
 > 📋 完整版见 **[docs/PUBLISH-SOP.md](docs/PUBLISH-SOP.md)** —— 含前置准备、
 > 发布前检查清单、异常处理（构建失败 / 部署失败 / 紧急回滚）。
 >
-> 🌐 域名与 HTTPS 见 **[docs/DOMAIN-SETUP.md](docs/DOMAIN-SETUP.md)** —— 备案资格体检、
-> 从「IP + HTTP」切到「域名 + HTTPS」的完整步骤。当前域名 `claspmoon.cn` 待备案。
+> 🌐 域名与 HTTPS 见 **[docs/DOMAIN-SETUP.md](docs/DOMAIN-SETUP.md)** —— 备案要求、
+> 切换步骤、证书排障。站点已上线：<https://claspmoon.cn>
 
 四步，前三步都在本地，最后一步自动完成。
 

@@ -1,7 +1,7 @@
 ---
 title: 深度学习进阶
 description: 网上（包括大部分系统课）的问题是：告诉你「用残差连接能解决退化」，但不告诉你为什么能、什么条件下会失效、怎么判断一个方案是真的有效还是在过拟合。
-order: 0
+order: 3
 ---
 
 # 深度学习进阶 · 从原理到研究方法
@@ -82,7 +82,7 @@ order: 0
 | [公式速查表](/guides/deep-learning/part5-appendix/17-formula-cheatsheet) | 所有关键公式一页汇总 |
 | [面试高频问题](/guides/deep-learning/part5-appendix/18-interview-questions) | 算法岗面试会问的 30 个问题（含答案要点） |
 | [llama_from_scratch.py](/downloads/llama_from_scratch.py) | **从零实现的 LLaMA**（RMSNorm + RoPE + GQA + SwiGLU + Pre-LN），已实测前向 + 反向通过 |
-| [深度学习进阶手册.html](/downloads/deep-learning-handbook.html) | 单页离线阅读版（19 篇全部打包，含公式与代码高亮） |
+| [深度学习进阶手册.html](/downloads/deep-learning-handbook.html) | 单页离线阅读版（24 页全部打包，含公式与代码高亮） |
 
 ---
 
@@ -151,6 +151,18 @@ python llama_from_scratch.py    # 前向 + loss + 反向，全程通过
 它包含 RMSNorm、RoPE、GQA、SwiGLU、Pre-LN 全部现代组件，可以直接作为你的实现参考。
 
 **文档里每段代码的输出都对应某个公式或结论（都是实测的）。如果你推出来的数和代码算出来的不一样，先信代码。**
+
+---
+
+## 配套材料
+
+这三份是同一套学习路径，按顺序读：
+
+| 指南 | 讲什么 | 什么时候看 |
+|---|---|---|
+| [张量运算图解](/guides/tensor-ops/) | 14 张图讲清形状、广播、矩阵乘 | 完全零基础时，先看这个 |
+| [PyTorch 入门学习笔记](/guides/pytorch/) | API 和完整训练流程 | 会写代码但没学过深度学习 |
+| [深度学习进阶](/guides/deep-learning/) | 从反向传播推导到 Transformer 与 LLaMA | 就是本文 |
 
 ---
 

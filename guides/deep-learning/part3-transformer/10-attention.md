@@ -332,7 +332,7 @@ print("→ 完全一致，但内置版本内存效率高得多")
 
 # 验证因果性：改变未来的 token，不应影响过去的输出
 V2 = V.clone()
-V2[:, :, 5:, :] = torch.randn(b, h, seq - 5, d) * 100# 疯狂改动后面的 token
+V2[:, :, 5:, :] = torch.randn(b, h, seq - 5, d) * 100 # 疯狂改动后面的 token
 out1 = manual_attention(Q, K, V, causal)
 out2 = manual_attention(Q, K, V2, causal)
 print(f"\n改动后 token 之后，输出差异: {(out1[:, :, :5] - out2[:, :, :5]).abs().max():.2e}")
@@ -350,7 +350,7 @@ import matplotlib.pyplot as plt
 # 造一个能看出结构的例子：后一半的 token 是前一半的「复制」
 seq = 8
 x = torch.randn(1, 1, seq, 32) * 0.5
-x[0, 0, 4:] = x[0, 0, :4]# token 4~7 是 0~3 的副本
+x[0, 0, 4:] = x[0, 0, :4]  # token 4~7 是 0~3 的副本
 
 lin_q = nn.Linear(32, 32); lin_k = nn.Linear(32, 32); lin_v = nn.Linear(32, 32)
 Q, K, V = lin_q(x), lin_k(x), lin_v(x)

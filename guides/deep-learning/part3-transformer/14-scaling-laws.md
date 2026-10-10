@@ -170,7 +170,7 @@ print(f"{'序列长度':>10}{'完整注意力矩阵':>18}{'FlashAttention':>18}{
 for L in [2048, 4096, 8192, 32768, 131072]:
     full_gb = B * H * L * L * 2 / 1e9
     # FlashAttention 只需存 O 和 logsumexp，是线性的
-    flash_mb = B * H * L * (128 + 4) * 2 / 1e6# O[d_head] + LSE
+    flash_mb = B * H * L * (128 + 4) * 2 / 1e6 # O[d_head] + LSE
     if full_gb > 0.1:
         print(f"{L:>10}{full_gb:>15.2f} GB{flash_mb:>15.1f} MB{full_gb * 1e3 / flash_mb:>9.0f}x")
 ```

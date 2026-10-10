@@ -1,7 +1,7 @@
 ---
 title: SQL
 description: 从查询语法到索引原理，把数据库真正用对。
-order: 5
+order: 8
 ---
 
 # SQL

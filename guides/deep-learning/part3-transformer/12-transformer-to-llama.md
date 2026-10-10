@@ -340,7 +340,7 @@ class LlamaModel(nn.Module):
                  n_kv_heads=32, max_seq=2048, ffn_hidden=None):
         super().__init__()
         self.d = d
-        ffn_hidden = ffn_hidden or int(8 * d / 3 / 64) * 64# 8/3 d，对齐64
+        ffn_hidden = ffn_hidden or int(8 * d / 3 / 64) * 64 # 8/3 d，对齐64
 
         self.embed = nn.Embedding(vocab, d)
         self.rope = RotaryEmbedding(d // n_heads, max_seq)  # RoPE 在 d_head 维度上做
@@ -364,7 +364,7 @@ class LlamaModel(nn.Module):
         cos, sin = self.rope(x.shape[1])
         for layer in self.layers:
             x = layer(x, cos, sin)
-        x = self.norm(x)# ★ final norm
+        x = self.norm(x) # ★ final norm
         return self.lm_head(x)
 
 

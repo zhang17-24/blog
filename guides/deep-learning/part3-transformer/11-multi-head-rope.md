@@ -343,11 +343,11 @@ print("→ 这就是为什么必须要有位置编码！")
 ```python
 import torch
 base = 10000
-d = 8# 假设 8 个频率
+d = 8 # 假设 8 个频率
 inv_freq = 1.0 / (base ** (torch.arange(0, d).float() / d))
 print("频率（inv_freq）:")
 for i, f in enumerate(inv_freq.tolist()):
-    pos_at_1 = f# 位置 1 时的角度
+    pos_at_1 = f # 位置 1 时的角度
     pos_at_1000 = f * 1000
     period = 2 * 3.14159 / f
     print(f"  维度{i}: inv_freq={f:.4f}  1个位置的转角={f:.4f}rad  "

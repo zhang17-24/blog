@@ -1,7 +1,7 @@
 ---
 title: Python
 description: 从语法基础到数据结构、再到异步编程的完整路径。
-order: 2
+order: 5
 ---
 
 # Python

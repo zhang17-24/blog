@@ -25,6 +25,9 @@ npm run preview   # 本地预览构建产物（和线上一致）
 >
 > 🌐 域名与 HTTPS 见 **[docs/DOMAIN-SETUP.md](docs/DOMAIN-SETUP.md)** —— 备案要求、
 > 切换步骤、证书排障。站点已上线：<https://claspmoon.cn>
+>
+> 📚 三套机器学习指南（张量运算图解 / PyTorch 入门 / 深度学习进阶）的来源、
+> 文件映射与离线手册生成方式见 **[docs/GUIDES.md](docs/GUIDES.md)**
 
 四步，前三步都在本地，最后一步自动完成。
 

@@ -183,7 +183,7 @@ print(f"模型: d_model={d}, n_heads={n_heads}, d_head={dh}, seq={L}, 32层, bat
 print(f"\n{'类型':<22}{'KV cache':>12}{'W_k/W_v 参数量':>18}{'节省':>10}")
 for name, nkv in [("MHA (32)", 32), ("GQA (16)", 16), ("GQA (8)", 8),
                   ("GQA (4)", 4), ("MQA (1)", 1)]:
-    kv_gb = 2 * nkv * L * dh * 32 * 2 * 2 / 1e9# batch=2
+    kv_gb = 2 * nkv * L * dh * 32 * 2 * 2 / 1e9 # batch=2
     param_m = 2 * d * nkv * dh / 1e6            # W_k + W_v
     save = kv_gb / (2 * 32 * L * dh * 32 * 2 * 2 / 1e9)
     print(f"{name:<22}{kv_gb:>10.2f} GB{param_m:>16.0f} M{save:>9.1f}x")
@@ -280,11 +280,11 @@ import torch
 
 # 计算 LLaMA-7B 的参数量（不含 embedding）
 d_model, n_layers = 4096, 32
-per_layer = 4 * d_model ** 2 + 3 * d_model * 8192# attn 4d² + SwiGLU 3d×8192
+per_layer = 4 * d_model ** 2 + 3 * d_model * 8192 # attn 4d² + SwiGLU 3d×8192
 total_weights = per_layer * n_layers
 
 print(f"权重总数: {total_weights / 1e9:.2f} B")
-bw = 2e12# A100 显存带宽 ~2 TB/s
+bw = 2e12 # A100 显存带宽 ~2 TB/s
 print(f"A100 带宽 {bw / 1e12:.1f} TB/s，单token 解码的理论上限:")
 for name, bytes_ in [("fp16", 2), ("int8", 1), ("int4", 0.5)]:
     t = total_weights * bytes_ / bw

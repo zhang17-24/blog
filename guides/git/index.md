@@ -1,7 +1,7 @@
 ---
 title: Git
 description: 从日常命令到分支策略，把版本控制真正用起来。
-order: 4
+order: 7
 ---
 
 # Git

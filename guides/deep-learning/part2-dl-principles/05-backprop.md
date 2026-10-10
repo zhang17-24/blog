@@ -256,7 +256,7 @@ dL_db2 = dL_dz2.sum(0)                       # [1]
 dL_da1 = dL_dz2 @ W2.T                       # [4,1]@[1,2] = [4,2]
 
 # ReLU：梯度在负半轴为 0
-dL_dz1 = dL_da1 * (z1 > 0).float()# [4,2]
+dL_dz1 = dL_da1 * (z1 > 0).float() # [4,2]
 
 # z1 = x @ W1 + b1，W1 是 [3,2]
 dL_dW1 = x.T @ dL_dz1                        # [3,4]@[4,2] = [3,2]

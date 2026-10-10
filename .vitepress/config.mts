@@ -224,6 +224,15 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [watchGuides()]
+    plugins: [watchGuides()],
+
+    build: {
+      /**
+       * 本地搜索索引是一个整体 chunk，页面越多越大（三套指南全量收进去后约 800 KB）。
+       * 它是**懒加载**的 —— 用户点开搜索框才会请求，不影响首屏。
+       * 所以这里把阈值调高，避免每次构建都刷一条无意义的告警。
+       */
+      chunkSizeWarningLimit: 1200
+    }
   }
 })

@@ -243,7 +243,7 @@ rng = np.random.default_rng(0)
 n = 200
 x = np.concatenate([rng.normal(0, 1, n), rng.normal(3, 1, n)])
 y = np.concatenate([np.zeros(n), np.ones(n)])
-x[-1] = 50.0# ★ 注入一个 outlier
+x[-1] = 50.0 # ★ 注入一个 outlier
 
 # L2 最小二乘：会被那个异常值严重拉偏
 coef_l2 = np.polyfit(x, y, 1)

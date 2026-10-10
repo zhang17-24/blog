@@ -1,7 +1,7 @@
 ---
 title: Go
 description: 从语法工具链到并发模型，用最少的语法把服务写扎实。
-order: 7
+order: 10
 ---
 
 # Go

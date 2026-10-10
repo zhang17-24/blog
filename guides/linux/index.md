@@ -1,7 +1,7 @@
 ---
 title: Linux
 description: 命令行基础与权限模型，服务器上最常用的那些东西。
-order: 6
+order: 9
 ---
 
 # Linux

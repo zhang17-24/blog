@@ -1,7 +1,7 @@
 ---
 title: Docker
 description: 从镜像分层到 compose 编排，再到用 Caddy 把站点跑起来。
-order: 3
+order: 6
 ---
 
 # Docker

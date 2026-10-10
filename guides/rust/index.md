@@ -1,7 +1,7 @@
 ---
 title: Rust
 description: 从所有权开始，把 Rust 的心智模型真正搭起来。
-order: 1
+order: 4
 ---
 
 # Rust
